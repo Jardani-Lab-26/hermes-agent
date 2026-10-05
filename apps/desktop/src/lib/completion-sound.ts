@@ -5,6 +5,7 @@ import { getAudioContext } from '@/lib/audio-context'
 import { ownsAmbientCue } from '@/store/ambient'
 import { $completionSoundVariantId, resolveCompletionSoundVariantId } from '@/store/completion-sound'
 import { $hapticsMuted } from '@/store/haptics'
+import { $soundCueVolume } from '@/store/sound-cue-volume'
 
 type OscType = OscillatorType
 
@@ -394,12 +395,15 @@ function playVariant(variantId: number) {
   }
 
   // Signal path: voices → master → low-pass → (dry + reverb send) → out.
+  // Base loudness is 0.48 at the default 1x user volume; $soundCueVolume
+  // (Settings → Notifications → Sound Volume, 0–2x) scales it from there,
+  // independent of the OS system/alert volume.
   const master = ac.createGain()
   const tone = ac.createBiquadFilter()
   tone.type = 'lowpass'
   tone.frequency.setValueAtTime(3800, ac.currentTime)
   tone.Q.setValueAtTime(0.32, ac.currentTime)
-  master.gain.setValueAtTime(0.48, ac.currentTime)
+  master.gain.setValueAtTime(0.48 * $soundCueVolume.get(), ac.currentTime)
   master.connect(tone)
 
   const dry = ac.createGain()
