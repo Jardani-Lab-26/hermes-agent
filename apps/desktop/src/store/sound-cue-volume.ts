@@ -8,11 +8,12 @@ const STORAGE_KEY = 'hermes.desktop.soundCueVolume'
 // chimes (lib/completion-sound.ts, lib/wake-sound.ts) were tuned quiet by
 // default; this lets users turn them up well past that without touching
 // macOS's system/alert volume, which most people don't want to disturb for
-// one app's cues. Capped at 2x — comfortably louder without the voices
-// clipping (see gain budget notes in completion-sound.ts).
+// one app's cues. Capped at 6x: a limiter on the output bus (see
+// completion-sound.ts / wake-sound.ts) keeps that genuinely loud without
+// harsh digital clipping.
 export const DEFAULT_SOUND_CUE_VOLUME = 1
 export const SOUND_CUE_VOLUME_MIN = 0
-export const SOUND_CUE_VOLUME_MAX = 2
+export const SOUND_CUE_VOLUME_MAX = 6
 
 export function resolveSoundCueVolume(volume: number): number {
   return Number.isFinite(volume)
