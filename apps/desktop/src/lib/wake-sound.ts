@@ -7,6 +7,7 @@
 
 import { getAudioContext } from '@/lib/audio-context'
 import { $hapticsMuted } from '@/store/haptics'
+import { $soundCueVolume } from '@/store/sound-cue-volume'
 
 // One enveloped sine voice → master. Linear-ish attack into an exponential
 // decay keeps the tail smooth and avoids the click you get ramping to zero.
@@ -44,7 +45,8 @@ export function playWakeSound(): void {
 
   try {
     const master = ac.createGain()
-    master.gain.setValueAtTime(0.5, ac.currentTime)
+    // Same 0–2x user scale as the turn-end cue (store/sound-cue-volume.ts).
+    master.gain.setValueAtTime(0.5 * $soundCueVolume.get(), ac.currentTime)
     master.connect(ac.destination)
 
     const t0 = ac.currentTime + 0.01
